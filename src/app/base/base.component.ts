@@ -9,6 +9,7 @@ export class BaseComponent {
 
   showSpinner(spinnerNameType:SpinnerType){
     this.spinner.show(spinnerNameType)
+    setTimeout(()=>this.hideSpinner(spinnerNameType),1000);
   }
 
   showSpinnerDummy(spinnerNameType:SpinnerType){
