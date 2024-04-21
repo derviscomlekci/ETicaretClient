@@ -4,6 +4,7 @@ import { ProductService } from '../../../../services/common/models/product.servi
 import { BaseComponent, SpinnerType } from '../../../../base/base.component';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { AlertifyService, MessagePosition, MessageType } from '../../../../services/admin/alertify.service';
+import { FileUploadOptions } from '../../../../services/common/file-upload/file-upload.component';
 
 @Component({
   selector: 'app-create',
@@ -19,6 +20,13 @@ export class CreateComponent extends BaseComponent implements OnInit {
   }
 
   @Output() createdProduct : EventEmitter<Create_Product>=new EventEmitter();
+  @Output() uploadFileOptions: Partial<FileUploadOptions>={
+    action:"upload",
+    controller:"products",
+    explanation:"Resimleri sürükleyin veya seçin...",
+    isAdminPage:true,
+    accept:".png, .jpeg, .jpg"
+  }
 
   create(name:HTMLInputElement,stock:HTMLInputElement,price:HTMLInputElement){
     this.showSpinner(SpinnerType.BallSpinClockwise);
@@ -35,7 +43,9 @@ export class CreateComponent extends BaseComponent implements OnInit {
         Position:MessagePosition.TopRight
       })
       this.createdProduct.emit(create_product);
-    },errorMessage=>{this.alertify.message(errorMessage,{
+    },errorMessage=>{
+      this.hideSpinner(SpinnerType.BallSpinClockwise)
+      this.alertify.message(errorMessage,{
       DismissOthers:true,
       MessageType:MessageType.Error,
       Position:MessagePosition.TopRight

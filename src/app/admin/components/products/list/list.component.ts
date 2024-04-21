@@ -26,8 +26,8 @@ export class ListComponent extends BaseComponent implements OnInit {
 
 
   async getProducts(){
-    this.showSpinner(SpinnerType.Fire);
-    const allProducts:{totalCount:number;products:List_Product[]}=await this.productservice.read(this.paginator ? this.paginator.pageIndex:0,this.paginator ? this.paginator.pageSize:5,()=>this.hideSpinner(SpinnerType.Fire),errorMessage=>this.alertiftService.message(errorMessage,{
+    this.showSpinner(SpinnerType.BallSpinClockwise);
+    const allProducts:{totalCount:number;products:List_Product[]}=await this.productservice.read(this.paginator ? this.paginator.pageIndex:0,this.paginator ? this.paginator.pageSize:5,()=>this.hideSpinner(SpinnerType.BallSpinClockwise),errorMessage=>this.alertiftService.message(errorMessage,{
       DismissOthers:true,
       MessageType:MessageType.Error,
       Position:MessagePosition.TopRight
