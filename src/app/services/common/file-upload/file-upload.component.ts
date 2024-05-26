@@ -1,3 +1,4 @@
+import { FileUploadDialogComponent, FileUploadDialogState } from './../../../dialogs/file-upload-dialog/file-upload-dialog.component';
 import { Component, Input } from '@angular/core';
 import { NgxFileDropEntry } from 'ngx-file-drop';
 import { HttpClientService } from '../http-client.service';
@@ -6,7 +7,9 @@ import { AlertifyService, MessagePosition, MessageType } from '../../admin/alert
 import { CustomToastrService, ToasterMessagePosition, ToasterMessageType } from '../../ui/custom-toastr.service';
 import { tick } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
-import { FileUploadDialogComponent, FileUploadDialogState } from '../../../dialogs/file-upload-dialog/file-upload-dialog.component';
+import { NgxSpinnerService } from 'ngx-spinner';
+import { DialogService } from '../dialog.service';
+import { SpinnerType } from '../../../base/base.component';
 
 @Component({
   selector: 'app-file-upload',
@@ -16,7 +19,12 @@ import { FileUploadDialogComponent, FileUploadDialogState } from '../../../dialo
 export class FileUploadComponent {
 
 
-  constructor(private httpClientService:HttpClientService, private alertifyService:AlertifyService,private customToasterService:CustomToastrService,private dialog:MatDialog) {}
+  constructor(private httpClientService:HttpClientService, 
+    private alertifyService:AlertifyService,
+    private customToasterService:CustomToastrService,
+    private dialog:MatDialog,
+    private dialogService:DialogService,
+    private spinner:NgxSpinnerService) {}
 
   public files: NgxFileDropEntry[];
 
@@ -30,49 +38,60 @@ export class FileUploadComponent {
     (file.fileEntry as FileSystemFileEntry).file((_file:File)=>{
       fileData.append(_file.name,_file,_file.name)
     });
-    this.openDialog(()=>{
-      this.httpClientService.post({
-        headers:new HttpHeaders({"responseType": "blob"}),
-        controller:this.options.controller,
-        action:this.options.action,
-        queryString:this.options.querySting,
-      },fileData).subscribe(data=>{
-  
-        const message: string="Dosyalar başarıyla yüklenmiştir.";
-  
+    this.dialogService.openDialog({
+      componentType:FileUploadDialogComponent,
+      data:FileUploadDialogState.Yes,
+      afterClosed:()=>{
+        this.spinner.show(SpinnerType.Fire)
+        this.httpClientService.post({
+          controller:this.options.controller,
+          action:this.options.action,
+          queryString:this.options.querySting,
+          headers:new HttpHeaders({"responseType": "blob"}),
+        },fileData).subscribe(data=>{
+    
+          const message: string="Dosyalar başarıyla yüklenmiştir.";
+          this.spinner.hide(SpinnerType.Fire)
+    
+            if(this.options.isAdminPage){
+                this.alertifyService.message(message,{
+                    DismissOthers:true,
+                    MessageType:MessageType.Success,
+                    Position:MessagePosition.TopRight
+                })
+            }
+            else{
+              this.customToasterService.message(message,"Başarılı.",{
+                messageType:ToasterMessageType.Success,
+                position:ToasterMessagePosition.TopRight
+            })
+            }
+        
+            
+        },(errorResponse:HttpErrorResponse)=>{
+          const message: string="Dosyalar yüklenirken beklenmeyen bir hata ile karşılaşılmıştır.";
+          this.spinner.hide(SpinnerType.Fire);
+    
           if(this.options.isAdminPage){
               this.alertifyService.message(message,{
                   DismissOthers:true,
-                  MessageType:MessageType.Success,
+                  MessageType:MessageType.Error,
                   Position:MessagePosition.TopRight
               })
           }
           else{
-            this.customToasterService.message(message,"Başarılı.",{
-              messageType:ToasterMessageType.Success,
+            this.customToasterService.message(message,"Başarısız.",{
+              messageType:ToasterMessageType.Error,
               position:ToasterMessagePosition.TopRight
           })
           }
           
-      },(errorResponse:HttpErrorResponse)=>{
-        const message: string="Dosyalar yüklenirken beklenmeyen bir hata ile karşılaşılmıştır.";
-  
-        if(this.options.isAdminPage){
-            this.alertifyService.message(message,{
-                DismissOthers:true,
-                MessageType:MessageType.Error,
-                Position:MessagePosition.TopRight
-            })
         }
-        else{
-          this.customToasterService.message(message,"Başarısız.",{
-            messageType:ToasterMessageType.Error,
-            position:ToasterMessagePosition.TopRight
-        })
-        }
+        
+        );
       }
-      );
-    })
+
+    });
     
    }
   }
