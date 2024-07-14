@@ -13,7 +13,6 @@ export class OrderComponent extends BaseComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.showSpinnerDummy(SpinnerType.Fire)
   }
 
 }

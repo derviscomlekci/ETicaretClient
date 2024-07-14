@@ -6,6 +6,7 @@ import { RouterModule } from '@angular/router';
 import { ProductsModule } from './products/products.module';
 import { RegisterComponent } from './register/register.component';
 import { RegisterModule } from './register/register.module';
+import { LoginModule } from './login/login.module';
 
 
 
@@ -18,7 +19,8 @@ import { RegisterModule } from './register/register.module';
     HomeModule,
     RouterModule,
     ProductsModule,
-    RegisterModule
+    RegisterModule,
+    LoginModule
   ]
 })
 export class ComponentsModule { }
