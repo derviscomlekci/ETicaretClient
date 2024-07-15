@@ -20,7 +20,6 @@ import { LoginModule } from './login/login.module';
     RouterModule,
     ProductsModule,
     RegisterModule,
-    LoginModule
   ]
 })
 export class ComponentsModule { }
